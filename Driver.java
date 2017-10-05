@@ -2,14 +2,14 @@ public class Driver {
 
 	public static void main(String[] args) {
 
-		Node newNode = new Node(5);
-		Node newNode2 = new Node(4);
+		AVLTree tree = new AVLTree(new Node(15));
 
-		newNode.left = newNode2;
-		newNode2.parent = newNode;
-
-		System.out.println(newNode);
-		System.out.println(newNode2);
+		tree.root = insert(tree.root, new Node(45));
+		tree.root = insert(tree.root, new Node(55));
+		tree.root = insert (tree.root, new Node(35));
+		tree.root = insert (tree.root, new Node(25));
+		tree.root = insert (tree.root, new Node(40));
+		tree.root = insert (tree.root, new Node(10));
 
 	}
 

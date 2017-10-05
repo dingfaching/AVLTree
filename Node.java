@@ -2,7 +2,7 @@ public class Node {
 	
 	public int key;
 	public int depth;
-	public int height;
+	public int rank;
 	public Node parent;
 	public Node left;
 	public Node right;
@@ -10,7 +10,7 @@ public class Node {
 	public Node(int inKey) {
 		key = inKey;
 		depth = 0;
-		height = 0;
+		rank = 0;
 		parent = null;
 		left = null;
 		right = null;
