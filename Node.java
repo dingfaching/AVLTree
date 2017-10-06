@@ -1,28 +1,40 @@
 public class Node {
-	
+
 	public int key;
-	public int depth;
 	public int rank;
-	public Node parent;
+	public int depth;
+
 	public Node left;
+	public Node parent;
 	public Node right;
 
+	public Node() {
+		this.key = -1;
+		this.rank = -1;
+		this.depth = -1;
+
+		this.left = null;
+		this.parent = null;
+		this.right = null;
+	}
+
 	public Node(int inKey) {
-		key = inKey;
-		depth = 0;
-		rank = 0;
-		parent = null;
-		left = null;
-		right = null;
+		this.key = inKey;
+		this.rank = -1;
+		this.depth = -1;
+
+		this.left = null;
+		this.parent = null;
+		this.right = null;		
 	}
 
 	public String toString() {
 		String output = "(" + this.key;
-		output += ": " + this.depth + ", ";
+		output += ": " + this.rank + ", ";
 		output += (this.parent != null) ? this.parent.key +", " : "null, ";
 		output += (this.left != null) ? this.left.key + ", " : "null, ";
 		output += (this.right != null) ? this.right.key + ")" : "null)";
-		return output;
+		return output;		
 	}
 
 }

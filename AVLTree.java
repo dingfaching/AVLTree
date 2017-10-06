@@ -1,120 +1,134 @@
-import java.util.Scanner;
-
 public class AVLTree {
 
 	public Node root;
 	public int n;
-	public int maxDepth;
+	public int height;
 
 	public AVLTree() {
 		this.root = null;
 		this.n = 0;
-		this.maxDepth = -1;
+		this.height = -1;
 	}
 
-	public AVLTree(Node inRoot) {
-		this.root = inRoot;
-		this.n = 1;
-		this.maxDepth = 0;
+	public void insert(int key) {
+
+		System.out.println("Insert " + key + "--------");
+		this.root = place(this.root, key);
+		System.out.println("-----------------\n");
+
+		//Update height
+		this.height = this.root.rank;
+
+		//Re-depth
+		this.setDepth(this.root);
+
 	}
 
-	/*  Left-left case : rightRotate() @ a
-				 <a>            b 
-			     / \           / \
-		  	    b   t4        c   a
-			   / \		=>   / \  | \
-		      c  t3         t1 t2 t3 t4
-		     / \
-	  	    t1 t2  
-	
-		Right-right case: leftRotate() @ a
-		   <a> 					b
-		   / \				   / \
-		  t1  b               /   \ 
-		     / \     =>      a     c
-		    t2  c 			/ \   / \
-		       / \		   t1 t2 t3 t4
-		      t3  t4
+	public Node place(Node node, int key) {
+		//DEBUG------------------------------
+		System.out.print("node key: ");
+		if(node != null)
+			System.out.println(node.key);
+		else
+			System.out.println("null");
+		System.out.println("in key: " + key);
+		//-----------------------------------
 
-		Left-Right case: leftRotate() @ b  =>  rightRotate() @ a
-		    a              <a> 				  c
-		   / \			   / \				 / \
-		 <b> t4			  c  t4				/   \
-		 / \      =>     / \        =>     b     a
-		t1  c           b  t3			  / \   / \
-		   / \         / \				 t1 t2 t3 t4
-		  t2  t3      t1  t2
-
-		Right-Left case: rightRotate() @ b  =>  leftRotate() @ a
-		    a 			  <a> 				  c
-		   / \			  / \				 / \
-		  t1 <b>		 t1  c 				/   \
-		     / \   =>       / \    =>      a     b
-		    c  t4		   t2  b 		  / \   / \
-		   / \			      / \        t1 t2 t3 t4
-		  t2 t3				 t3 t4
-
-	*/
-	public Node insert(Node node, int key) {
-
-		//BST Insertion (recursive)
+		//BST
 		if(node == null) {
-			return(new Node(key));
+			System.out.println("key " + key + " inserted.");
+			Node newNode = new Node(key);
+			newNode.rank = 1;
+			return newNode;
 		}
 
 		if(key < node.key) {
-			node.left = insert(node.left, key);
-			node.left.parent = node;
-		} else if (node.key < key) {
-			node.right = insert(node.right, key);
-			node.right.parent = node;
+			System.out.println("< Left");
+			node.left = place(node.left, key);
+			if(node.left != null)
+				node.left.parent = node;
+		} else if(node.key < key) {
+			System.out.println("> Right");
+			node.right = place(node.right, key);
+			if(node.right != null)
+				node.right.parent = node;
 		} else {
-			System.out.println(AVLTreeMessage.EXISTS);
+			System.out.println("Node with key " + key + " already exists.");
 			return node;
 		}
 
-		//Update current node balance information
+		//Rerank
+		this.setRank(node);
+
+		//Get balance of node
 		int balance = getBalance(node);
 
-		//Left-Left case
-		if(balance > 1 && key < node.left.key) {
-			return rightRotate(node);
+		//Determine if balanced, and which case is evident if unbalanced
+		/*  Left-left case : rightRotate() @ a
+					 <a>            b 
+				     / \           / \
+			  	    b   t4        c   a
+				   / \		=>   / \  | \
+			      c  t3         t1 t2 t3 t4
+			     / \
+		  	    t1 t2  
+		
+			Right-right case: leftRotate() @ a
+			   <a> 					b
+			   / \				   / \
+			  t1  b               /   \ 
+			     / \     =>      a     c
+			    t2  c 			/ \   / \
+			       / \		   t1 t2 t3 t4
+			      t3  t4
+			Left-Right case: leftRotate() @ b  =>  rightRotate() @ a
+			    a              <a> 				  c
+			   / \			   / \				 / \
+			 <b> t4			  c  t4				/   \
+			 / \      =>     / \        =>     b     a
+			t1  c           b  t3			  / \   / \
+			   / \         / \				 t1 t2 t3 t4
+			  t2  t3      t1  t2
+			Right-Left case: rightRotate() @ b  =>  leftRotate() @ a
+			    a 			  <a> 				  c
+			   / \			  / \				 / \
+			  t1 <b>		 t1  c 				/   \
+			     / \   =>       / \    =>      a     b
+			    c  t4		   t2  b 		  / \   / \
+			   / \			      / \        t1 t2 t3 t4
+			  t2 t3				 t3 t4
+		*/
+
+		if(balance > 1) {
+			//Left-Left case
+			Node leftChild = node.left;
+			if(key < leftChild.key) {
+				return this.rightRotate(node);
+			} 
+			//Left-Right case
+			else if(leftChild.key < key) {
+				node.left = this.leftRotate(node.left);
+				return this.rightRotate(node);
+			}
+		} else if (balance < -1) {
+			//Right-Right case
+			Node rightChild = node.right;
+			if(rightChild.key < key) {
+				return this.leftRotate(node);
+			}
+			//Right-Left case
+			else if(key < rightChild.key) {
+				node.right = this.rightRotate(node.right);
+				return leftRotate(node);
+			}
 		}
-		//Right-Right case
-		else if(balance < -1 && node.right.key < key) {
-			return leftRotate(node);
-		}
-		//Left-Right case
-		else if(balance > 1 && node.left.key < key) {
-			node.left = leftRotate(node.left);
-			return rightRotate(node);
-		}
-		//Right-Left case
-		else if(balance < -1 && key < node.right.key) {
-			node.right = rightRotate(node.right);
-			return leftRotate(node);
-		}
+
 		return node;
 	}
 
-	public int getBalance(Node node) {
-		int b = (node.left == null) ? 0 : node.left.rank;
-		int c = (node.right == null) ? 0 : node.right.rank;
-		return b - c;
-	}
-
-	public int max(int a, int b) {
-		return (a > b) ? a : b;
-	}
-
-	public int getRank(Node node) {
-		if(node == null) {
-			return 0;
-		}
-		return max(getRank(node.left), getRank(node.right)) + 1;
-	}
-
 	public Node rightRotate(Node node) {
+		
+		//Set nodes to be moved
 		Node a = node;
 		Node b = node.left;
 		Node t3 = b.right;
@@ -122,15 +136,15 @@ public class AVLTree {
 		//Perform rotation
 		b.parent = a.parent;
 		a.parent = b;
-		t3.parent = a;
+		if(t3 != null) {t3.parent = a;}
 		a.left = t3;
 		b.right = a;
 
-		//Update heights
+		//Update ranks
 		a.rank = max(getRank(a.left), getRank(a.right));
 		b.rank = max(getRank(b.left), getRank(b.right));
 
-		//Return the new root of the subtree
+		//Return new root of the subtree
 		return b;
 	}
 
@@ -142,7 +156,7 @@ public class AVLTree {
 		//Perform rotation
 		b.parent = a.parent;
 		a.parent = b;
-		t2.parent = a;
+		if(t2 != null) {t2.parent = a;}
 		a.right = t2;
 		b.left = a;
 
@@ -151,43 +165,53 @@ public class AVLTree {
 		b.rank = max(getRank(b.left), getRank(b.right));
 
 		//return new root of subtree
-		return b;
+		return b;		
 	}
 
-	public void updateDepth() {
-		this.maxDepth = 0;
-		root.depth = 0;
-		setDepth(root.left);
-		setDepth(root.right);
+	public int max(int a, int b) {
+		return (a > b) ? a : b;
+	}
+
+	public int getRank(Node node) {
+		if(node == null) {
+			return 0;
+		}
+		return node.rank;
+	}
+
+	public int getBalance(Node node) {
+		return getRank(node.left) - getRank(node.right);
+	}
+
+	public void setRank(Node node) {
+		if(node == null)
+			return;
+		setRank(node.left);
+		setRank(node.right);
+		node.rank = 1 + max(getRank(node.left), getRank(node.right));
 	}
 
 	public void setDepth(Node node) {
 		
-		// Base return
-		if(node == null) {
+		if(node == null)
 			return;
-		}
-		
-		// Set depth of current node
-		node.depth = node.parent.depth + 1;
 
-		// Update max depth
-		if(maxDepth < node.depth) {
-			maxDepth = node.depth;
-		}
+		if(node.parent == null)
+			node.depth = 0;
+		else
+			node.depth = node.parent.depth + 1;
 
-		// Continue recursively
-		setDepth(node.left);
-		setDepth(node.right);
+		this.setDepth(node.left);
+		this.setDepth(node.right);
 	}
 
-	public void preOrderPrint(Node node) {
+	public void inOrderPrint(Node node) {
 		if(node == null) {
 			return;
 		}
-		preOrderPrint(node.left);
-		System.out.println(node.toString());
-		preOrderPrint(node.right);
+		inOrderPrint(node.left);
+		System.out.println(node);
+		inOrderPrint(node.right);
 	}
 
 }
