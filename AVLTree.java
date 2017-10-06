@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 public class AVLTree {
 
 	public Node root;
@@ -74,11 +76,6 @@ public class AVLTree {
 		//Update current node balance information
 		int balance = getBalance(node);
 
-		//If the node is balanced correctly, simply return the node unchanged
-		if(-1 <= balance && balance <= 1) {
-			return node;
-		}
-
 		//Left-Left case
 		if(balance > 1 && key < node.left.key) {
 			return rightRotate(node);
@@ -114,7 +111,7 @@ public class AVLTree {
 		if(node == null) {
 			return 0;
 		}
-		return node.rank;
+		return max(getRank(node.left), getRank(node.right)) + 1;
 	}
 
 	public Node rightRotate(Node node) {
@@ -158,7 +155,8 @@ public class AVLTree {
 	}
 
 	public void updateDepth() {
-		this.maxDepth = root.depth = 0;
+		this.maxDepth = 0;
+		root.depth = 0;
 		setDepth(root.left);
 		setDepth(root.right);
 	}
@@ -191,5 +189,5 @@ public class AVLTree {
 		System.out.println(node.toString());
 		preOrderPrint(node.right);
 	}
-	
+
 }
