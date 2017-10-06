@@ -157,29 +157,39 @@ public class AVLTree {
 		return b;
 	}
 
-	public int updateDepth() {
-		root.depth = 0;
+	public void updateDepth() {
+		this.maxDepth = root.depth = 0;
 		setDepth(root.left);
 		setDepth(root.right);
 	}
 
 	public void setDepth(Node node) {
-		if(node = null) {
+		
+		// Base return
+		if(node == null) {
 			return;
 		}
+		
+		// Set depth of current node
 		node.depth = node.parent.depth + 1;
+
+		// Update max depth
+		if(maxDepth < node.depth) {
+			maxDepth = node.depth;
+		}
+
+		// Continue recursively
 		setDepth(node.left);
 		setDepth(node.right);
 	}
 
-	public String inOrderTraversal(Node node) {
-		
+	public void preOrderPrint(Node node) {
+		if(node == null) {
+			return;
+		}
+		preOrderPrint(node.left);
+		System.out.println(node.toString());
+		preOrderPrint(node.right);
 	}
-
-	public String toString() {
-
-	}
-
-
 	
 }
