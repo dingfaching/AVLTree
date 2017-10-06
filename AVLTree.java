@@ -1,15 +1,21 @@
 public class AVLTree {
 
+	//Class variables
 	public Node root;
 	public int n;
 	public int height;
 
+	//Constructor
 	public AVLTree() {
 		this.root = null;
 		this.n = 0;
 		this.height = -1;
 	}
 
+	/**************************************
+	* Insert method
+	*
+	**************************************/
 	public void insert(int key) {
 
 		System.out.println("Insert " + key + "--------");
@@ -24,6 +30,27 @@ public class AVLTree {
 
 	}
 
+	/**************************************
+	* remove method
+	*
+	**************************************/
+	public Node remove(int key) {
+
+		Node nodeToRemove = this.search(this.root, key);
+
+		if(nodeToRemove == null) {
+			return null;
+		}
+
+		this.detach(nodeToRemove);
+
+		return nodeToRemove;
+	}
+
+	/**************************************
+	* Place method
+	*
+	**************************************/
 	public Node place(Node node, int key) {
 		//DEBUG------------------------------
 		System.out.print("node key: ");
@@ -126,6 +153,10 @@ public class AVLTree {
 		return node;
 	}
 
+	/**************************************
+	* rightRotate method
+	*
+	**************************************/	
 	public Node rightRotate(Node node) {
 		
 		//Set nodes to be moved
@@ -148,6 +179,10 @@ public class AVLTree {
 		return b;
 	}
 
+	/**************************************
+	* leftRotate method
+	*
+	**************************************/	
 	public Node leftRotate(Node node) {
 		Node a = node;
 		Node b = a.right;
@@ -168,10 +203,18 @@ public class AVLTree {
 		return b;		
 	}
 
+	/**************************************
+	* max method
+	*
+	**************************************/	
 	public int max(int a, int b) {
 		return (a > b) ? a : b;
 	}
 
+	/**************************************
+	* getRank method
+	*
+	**************************************/	
 	public int getRank(Node node) {
 		if(node == null) {
 			return 0;
@@ -179,10 +222,18 @@ public class AVLTree {
 		return node.rank;
 	}
 
+	/**************************************
+	* getBalance method
+	*
+	**************************************/	
 	public int getBalance(Node node) {
 		return getRank(node.left) - getRank(node.right);
 	}
 
+	/**************************************
+	* setRank method
+	*
+	**************************************/	
 	public void setRank(Node node) {
 		if(node == null)
 			return;
@@ -191,6 +242,10 @@ public class AVLTree {
 		node.rank = 1 + max(getRank(node.left), getRank(node.right));
 	}
 
+	/**************************************
+	* setDepth method
+	*
+	**************************************/	
 	public void setDepth(Node node) {
 		
 		if(node == null)
@@ -205,6 +260,56 @@ public class AVLTree {
 		this.setDepth(node.right);
 	}
 
+	/**************************************
+	* search method
+	*
+	**************************************/
+	public Node search(Node node, int key) {
+
+		//If key doesn't exist
+		if(node == null) {
+			return null;
+		}
+
+		if(node.key == key) {
+			return node;
+		}
+
+		if(key < node.key) {
+			return search(node.left, key);
+		} else if(node.key < key) {
+			return search(node.right, key);
+		}
+
+		return node;
+
+	}
+
+	public void detach(Node node) {
+		Node leftChild = node.left;
+		Node rightChild = node.right;
+
+		//Node is the root
+		if(node.parent == null) {
+		
+		}
+
+		if(leftChild == null) {
+			rightChild.parent = node.parent;
+		}
+		if(rightChild == null) {
+			leftChild.parent = node.parent;
+		}
+
+		node.parent = null;
+		node.left = null;
+		node.right = null;
+	}
+
+	/**************************************
+	* inOrderPrint method
+	*
+	**************************************/	
 	public void inOrderPrint(Node node) {
 		if(node == null) {
 			return;
